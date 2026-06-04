@@ -1,6 +1,8 @@
 package ni.edu.uam.inventarioacademicopractica.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -8,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ni.edu.uam.inventarioacademicopractica.ui.component.BarChartComponent
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.DashboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,6 +22,7 @@ fun DashboardScreen(
     onRegistrarPrestamoClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -29,7 +33,8 @@ fun DashboardScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -51,19 +56,29 @@ fun DashboardScreen(
                 )
             }
 
-            DashboardCard(
-                title = "Prestados",
-                value = uiState.equiposPrestados.toString(),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                DashboardCard(
+                    title = "Prestados",
+                    value = uiState.equiposPrestados.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                DashboardCard(
+                    title = "Categoría Dominante",
+                    value = uiState.categoriaDominante,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
-            DashboardCard(
-                title = "Categoría Dominante",
-                value = uiState.categoriaDominante,
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (uiState.equiposPorCategoria.isNotEmpty()) {
+                Text(
+                    text = "Equipos por Categoría",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                BarChartComponent(data = uiState.equiposPorCategoria)
+            }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = onVerEquiposClick,
