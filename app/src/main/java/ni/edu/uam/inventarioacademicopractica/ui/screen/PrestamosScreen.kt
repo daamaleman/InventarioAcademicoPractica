@@ -1,11 +1,19 @@
 package ni.edu.uam.inventarioacademicopractica.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ni.edu.uam.inventarioacademicopractica.data.local.entity.Equipo
+import ni.edu.uam.inventarioacademicopractica.ui.component.StyledTextField
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.PrestamoViewModel
 import java.text.SimpleDateFormat
@@ -27,17 +35,31 @@ fun PrestamosScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Registrar Préstamo") })
+            TopAppBar(
+                title = { Text("Registrar Préstamo", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)) },
+                navigationIcon = {
+                    IconButton(onClick = onPrestamoRegistrado) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
+                    }
+                }
+            )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Selección de Equipo
+            Text(
+                text = "Detalles del Préstamo",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+
+            // Selección de Equipo con estilo mejorado
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -46,44 +68,52 @@ fun PrestamosScreen(
                     value = equipoSeleccionado?.nombre ?: "Seleccione un equipo",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Equipo") },
+                    label = { Text("Equipo Disponible") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    leadingIcon = { Icon(Icons.Default.Devices, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.LightGray)
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    equiposDisponibles.forEach { equipo ->
+                    if (equiposDisponibles.isEmpty()) {
                         DropdownMenuItem(
-                            text = { Text("${equipo.nombre} (${equipo.numeroSerie})") },
-                            onClick = {
-                                equipoSeleccionado = equipo
-                                expanded = false
-                            }
+                            text = { Text("No hay equipos disponibles") },
+                            onClick = { expanded = false }
                         )
+                    } else {
+                        equiposDisponibles.forEach { equipo ->
+                            DropdownMenuItem(
+                                text = { Text("${equipo.nombre} (${equipo.numeroSerie})") },
+                                onClick = {
+                                    equipoSeleccionado = equipo
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
 
-            // Solicitante
-            OutlinedTextField(
+            StyledTextField(
                 value = solicitante,
                 onValueChange = { solicitante = it },
-                label = { Text("Nombre del Solicitante") },
-                modifier = Modifier.fillMaxWidth()
+                label = "Nombre del Solicitante",
+                icon = Icons.Default.Person
             )
 
-            // Fecha (Simple text field por ahora, o un DatePicker)
-            OutlinedTextField(
+            StyledTextField(
                 value = fecha,
                 onValueChange = { fecha = it },
-                label = { Text("Fecha (AAAA-MM-DD)") },
-                modifier = Modifier.fillMaxWidth()
+                label = "Fecha (AAAA-MM-DD)",
+                icon = Icons.Default.Event
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
@@ -93,10 +123,12 @@ fun PrestamosScreen(
                         onPrestamoRegistrado()
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = equipoSeleccionado != null && solicitante.isNotBlank()
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                enabled = equipoSeleccionado != null && solicitante.isNotBlank(),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text("Confirmar Préstamo")
+                Text("CONFIRMAR PRÉSTAMO", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
             }
         }
     }

@@ -91,7 +91,8 @@ fun InventarioNavGraph(navController: NavHostController) {
             val equipoViewModel: EquipoViewModel = viewModel(factory = factory)
             HistorialScreen(
                 prestamoViewModel = prestamoViewModel,
-                equipoViewModel = equipoViewModel
+                equipoViewModel = equipoViewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }

@@ -1,12 +1,19 @@
 package ni.edu.uam.inventarioacademicopractica.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ni.edu.uam.inventarioacademicopractica.data.local.entity.Equipo
+import ni.edu.uam.inventarioacademicopractica.ui.component.StyledTextField
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,8 +27,10 @@ fun FormularioEquipoScreen(
     var categoria by remember { mutableStateOf("") }
     var marca by remember { mutableStateOf("") }
     var numeroSerie by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
     val equipos by viewModel.equipos.collectAsState()
+    val categorias = listOf("Laptop", "Monitor", "Impresora", "Router")
     
     LaunchedEffect(equipoId) {
         if (equipoId != -1) {
@@ -37,42 +46,84 @@ fun FormularioEquipoScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(if (equipoId == -1) "Registrar Equipo" else "Editar Equipo") })
+            TopAppBar(
+                title = { 
+                    Text(
+                        if (equipoId == -1) "Nuevo Equipo" else "Editar Equipo",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    ) 
+                },
+                navigationIcon = {
+                    IconButton(onClick = onEquipoGuardado) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
+                    }
+                }
+            )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(24.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            OutlinedTextField(
+            StyledTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = categoria,
-                onValueChange = { categoria = it },
-                label = { Text("Categoría") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = marca,
-                onValueChange = { marca = it },
-                label = { Text("Marca") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = numeroSerie,
-                onValueChange = { numeroSerie = it },
-                label = { Text("Número de Serie") },
-                modifier = Modifier.fillMaxWidth()
+                label = "Nombre del Equipo",
+                icon = Icons.Default.Badge
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Categoría Dropdown
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = categoria,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Categoría") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.LightGray)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    categorias.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item) },
+                            onClick = {
+                                categoria = item
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            StyledTextField(
+                value = marca,
+                onValueChange = { marca = it },
+                label = "Marca / Fabricante",
+                icon = Icons.Default.Business
+            )
+
+            StyledTextField(
+                value = numeroSerie,
+                onValueChange = { numeroSerie = it },
+                label = "Número de Serie",
+                icon = Icons.Default.Fingerprint
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
@@ -93,9 +144,14 @@ fun FormularioEquipoScreen(
                         onEquipoGuardado()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text(if (equipoId == -1) "Guardar Equipo" else "Actualizar Equipo")
+                Text(
+                    if (equipoId == -1) "REGISTRAR EQUIPO" else "GUARDAR CAMBIOS",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
         }
     }
