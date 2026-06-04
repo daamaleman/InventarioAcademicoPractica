@@ -10,12 +10,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import ni.edu.uam.inventarioacademicopractica.InventarioApplication
 import ni.edu.uam.inventarioacademicopractica.ui.screen.*
-import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.DashboardViewModel
-import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
-import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.PrestamoViewModel
-import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.ViewModelFactory
+import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.*
 
 sealed class Screen(val route: String) {
+    object Login : Screen("login")
     object Dashboard : Screen("dashboard")
     object ListaEquipos : Screen("lista_equipos")
     object FormularioEquipo : Screen("formulario_equipo/{equipoId}") {
@@ -29,12 +27,27 @@ sealed class Screen(val route: String) {
 fun InventarioNavGraph(navController: NavHostController) {
     val context = LocalContext.current
     val application = context.applicationContext as InventarioApplication
-    val factory = ViewModelFactory(application.equipoRepository, application.prestamoRepository)
+    val factory = ViewModelFactory(
+        application.equipoRepository, 
+        application.prestamoRepository,
+        application.authRepository
+    )
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.route
+        startDestination = Screen.Login.route
     ) {
+        composable(Screen.Login.route) {
+            val loginViewModel: LoginViewModel = viewModel(factory = factory)
+            LoginScreen(
+                viewModel = loginViewModel,
+                onLoginSuccess = { 
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(Screen.Dashboard.route) {
             val dashboardViewModel: DashboardViewModel = viewModel(factory = factory)
             DashboardScreen(
