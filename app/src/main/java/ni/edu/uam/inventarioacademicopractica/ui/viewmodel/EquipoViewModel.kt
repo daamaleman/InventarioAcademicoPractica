@@ -15,15 +15,16 @@ class EquipoViewModel(private val repository: EquipoRepository) : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    // Flujo de estado que expone la lista de equipos filtrada por la búsqueda
-    val equipos: StateFlow<List<Equipo>> = _searchQuery
+    private val _selectedCategory = MutableStateFlow("")
+    val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
+
+    // Flujo de estado que expone la lista de equipos filtrada por búsqueda y categoría
+    val equipos: StateFlow<List<Equipo>> = combine(_searchQuery, _selectedCategory) { query, category ->
+        Pair(query, category)
+    }
         .debounce(300)
-        .flatMapLatest { query ->
-            if (query.isEmpty()) {
-                repository.allEquipos
-            } else {
-                repository.searchEquipos(query)
-            }
+        .flatMapLatest { (query, category) ->
+            repository.searchAndFilterEquipos(query, category)
         }
         .stateIn(
             scope = viewModelScope,
@@ -40,6 +41,10 @@ class EquipoViewModel(private val repository: EquipoRepository) : ViewModel() {
 
     fun onSearchQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
+    }
+
+    fun onCategorySelected(category: String) {
+        _selectedCategory.value = category
     }
 
     fun insert(equipo: Equipo) = viewModelScope.launch {

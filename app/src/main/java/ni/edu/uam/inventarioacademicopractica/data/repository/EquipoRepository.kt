@@ -13,4 +13,5 @@ class EquipoRepository(private val equipoDao: EquipoDao) {
     suspend fun delete(equipo: Equipo) = equipoDao.delete(equipo)
     suspend fun getEquipoById(id: Int) = equipoDao.getEquipoById(id)
     fun searchEquipos(query: String) = equipoDao.searchEquipos(query)
+    fun searchAndFilterEquipos(query: String, category: String) = equipoDao.searchAndFilterEquipos(query, category)
 }

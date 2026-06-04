@@ -25,7 +25,10 @@ fun ListaEquiposScreen(
 ) {
     val equipos by viewModel.equipos.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
     var equipoAEliminar by remember { mutableStateOf<Equipo?>(null) }
+    
+    val categorias = listOf("Laptop", "Monitor", "Impresora", "Router")
 
     if (equipoAEliminar != null) {
         AlertDialog(
@@ -76,6 +79,29 @@ fun ListaEquiposScreen(
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true
             )
+
+            // Filtros de categoría
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Opción para quitar filtro
+                FilterChip(
+                    selected = selectedCategory == "",
+                    onClick = { viewModel.onCategorySelected("") },
+                    label = { Text("Todos") }
+                )
+                
+                categorias.forEach { categoria ->
+                    FilterChip(
+                        selected = selectedCategory == categoria,
+                        onClick = { viewModel.onCategorySelected(categoria) },
+                        label = { Text(categoria) }
+                    )
+                }
+            }
 
             if (equipos.isEmpty()) {
                 Box(

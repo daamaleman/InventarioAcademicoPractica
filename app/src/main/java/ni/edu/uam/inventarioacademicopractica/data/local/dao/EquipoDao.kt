@@ -31,4 +31,7 @@ interface EquipoDao {
 
     @Query("SELECT * FROM equipos WHERE nombre LIKE '%' || :query || '%' OR numeroSerie LIKE '%' || :query || '%' ORDER BY nombre ASC")
     fun searchEquipos(query: String): Flow<List<Equipo>>
+
+    @Query("SELECT * FROM equipos WHERE (nombre LIKE '%' || :query || '%' OR numeroSerie LIKE '%' || :query || '%') AND (:category = '' OR categoria = :category) ORDER BY nombre ASC")
+    fun searchAndFilterEquipos(query: String, category: String): Flow<List<Equipo>>
 }
