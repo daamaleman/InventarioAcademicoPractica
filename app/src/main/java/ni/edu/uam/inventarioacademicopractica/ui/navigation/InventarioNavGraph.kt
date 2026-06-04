@@ -75,7 +75,11 @@ fun InventarioNavGraph(navController: NavHostController) {
         }
         composable(Screen.Historial.route) {
             val prestamoViewModel: PrestamoViewModel = viewModel(factory = factory)
-            HistorialScreen(viewModel = prestamoViewModel)
+            val equipoViewModel: EquipoViewModel = viewModel(factory = factory)
+            HistorialScreen(
+                prestamoViewModel = prestamoViewModel,
+                equipoViewModel = equipoViewModel
+            )
         }
     }
 }
