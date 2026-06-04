@@ -12,7 +12,8 @@ import ni.edu.uam.inventarioacademicopractica.data.repository.PrestamoRepository
 data class DashboardState(
     val totalEquipos: Int = 0,
     val equiposDisponibles: Int = 0,
-    val equiposPrestados: Int = 0
+    val equiposPrestados: Int = 0,
+    val categoriaDominante: String = "N/A"
 )
 
 class DashboardViewModel(
@@ -23,10 +24,14 @@ class DashboardViewModel(
     // Estado del dashboard calculado a partir del flujo de equipos
     val uiState: StateFlow<DashboardState> = equipoRepository.allEquipos
         .map { equipos ->
+            val dominante = equipos.groupBy { it.categoria }
+                .maxByOrNull { it.value.size }?.key ?: "N/A"
+                
             DashboardState(
                 totalEquipos = equipos.size,
                 equiposDisponibles = equipos.count { it.disponible },
-                equiposPrestados = equipos.count { !it.disponible }
+                equiposPrestados = equipos.count { !it.disponible },
+                categoriaDominante = dominante
             )
         }
         .stateIn(

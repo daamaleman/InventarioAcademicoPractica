@@ -57,6 +57,12 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            DashboardCard(
+                title = "Categoría Dominante",
+                value = uiState.categoriaDominante,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
