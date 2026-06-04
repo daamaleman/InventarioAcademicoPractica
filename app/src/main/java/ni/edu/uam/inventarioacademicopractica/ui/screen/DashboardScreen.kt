@@ -14,7 +14,9 @@ import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.DashboardViewModel
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
-    onVerEquiposClick: () -> Unit
+    onVerEquiposClick: () -> Unit,
+    onVerHistorialClick: () -> Unit,
+    onRegistrarPrestamoClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -62,6 +64,20 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Ver Lista de Equipos")
+            }
+
+            Button(
+                onClick = onRegistrarPrestamoClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Registrar Nuevo Préstamo")
+            }
+
+            Button(
+                onClick = onVerHistorialClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ver Historial de Préstamos")
             }
         }
     }

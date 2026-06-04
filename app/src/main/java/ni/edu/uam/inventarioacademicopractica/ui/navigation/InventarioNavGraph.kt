@@ -39,7 +39,9 @@ fun InventarioNavGraph(navController: NavHostController) {
             val dashboardViewModel: DashboardViewModel = viewModel(factory = factory)
             DashboardScreen(
                 viewModel = dashboardViewModel,
-                onVerEquiposClick = { navController.navigate(Screen.ListaEquipos.route) }
+                onVerEquiposClick = { navController.navigate(Screen.ListaEquipos.route) },
+                onVerHistorialClick = { navController.navigate(Screen.Historial.route) },
+                onRegistrarPrestamoClick = { navController.navigate(Screen.Prestamos.route) }
             )
         }
         composable(Screen.ListaEquipos.route) {
@@ -72,7 +74,8 @@ fun InventarioNavGraph(navController: NavHostController) {
             )
         }
         composable(Screen.Historial.route) {
-            HistorialScreen()
+            val prestamoViewModel: PrestamoViewModel = viewModel(factory = factory)
+            HistorialScreen(viewModel = prestamoViewModel)
         }
     }
 }
