@@ -6,6 +6,7 @@ import ni.edu.uam.inventarioacademicopractica.data.local.entity.Equipo
 
 class EquipoRepository(private val equipoDao: EquipoDao) {
     val allEquipos: Flow<List<Equipo>> = equipoDao.getAllEquipos()
+    val equiposDisponibles: Flow<List<Equipo>> = equipoDao.getEquiposDisponibles()
 
     suspend fun insert(equipo: Equipo) = equipoDao.insert(equipo)
     suspend fun update(equipo: Equipo) = equipoDao.update(equipo)

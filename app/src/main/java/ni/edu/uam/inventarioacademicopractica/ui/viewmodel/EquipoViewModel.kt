@@ -19,6 +19,13 @@ class EquipoViewModel(private val repository: EquipoRepository) : ViewModel() {
             initialValue = emptyList()
         )
 
+    val equiposDisponibles: StateFlow<List<Equipo>> = repository.equiposDisponibles
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     fun insert(equipo: Equipo) = viewModelScope.launch {
         repository.insert(equipo)
     }

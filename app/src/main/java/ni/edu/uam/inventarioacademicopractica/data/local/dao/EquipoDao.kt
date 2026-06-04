@@ -23,6 +23,9 @@ interface EquipoDao {
     @Query("SELECT * FROM equipos ORDER BY nombre ASC")
     fun getAllEquipos(): Flow<List<Equipo>>
 
+    @Query("SELECT * FROM equipos WHERE disponible = 1 ORDER BY nombre ASC")
+    fun getEquiposDisponibles(): Flow<List<Equipo>>
+
     @Query("SELECT * FROM equipos WHERE id = :id")
     suspend fun getEquipoById(id: Int): Equipo?
 }

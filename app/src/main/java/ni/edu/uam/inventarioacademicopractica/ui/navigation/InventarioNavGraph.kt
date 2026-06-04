@@ -12,6 +12,7 @@ import ni.edu.uam.inventarioacademicopractica.InventarioApplication
 import ni.edu.uam.inventarioacademicopractica.ui.screen.*
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.DashboardViewModel
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
+import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.PrestamoViewModel
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.ViewModelFactory
 
 sealed class Screen(val route: String) {
@@ -62,7 +63,13 @@ fun InventarioNavGraph(navController: NavHostController) {
             )
         }
         composable(Screen.Prestamos.route) {
-            PrestamosScreen()
+            val equipoViewModel: EquipoViewModel = viewModel(factory = factory)
+            val prestamoViewModel: PrestamoViewModel = viewModel(factory = factory)
+            PrestamosScreen(
+                equipoViewModel = equipoViewModel,
+                prestamoViewModel = prestamoViewModel,
+                onPrestamoRegistrado = { navController.popBackStack() }
+            )
         }
         composable(Screen.Historial.route) {
             HistorialScreen()

@@ -16,7 +16,7 @@ class ViewModelFactory(
         }
         if (modelClass.isAssignableFrom(PrestamoViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PrestamoViewModel(prestamoRepository) as T
+            return PrestamoViewModel(prestamoRepository, equipoRepository) as T
         }
         if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
