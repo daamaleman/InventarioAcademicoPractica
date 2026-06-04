@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ fun ListaEquiposScreen(
     onEditarClick: (Int) -> Unit
 ) {
     val equipos by viewModel.equipos.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     var equipoAEliminar by remember { mutableStateOf<Equipo?>(null) }
 
     if (equipoAEliminar != null) {
@@ -58,29 +60,43 @@ fun ListaEquiposScreen(
             }
         }
     ) { padding ->
-        if (equipos.isEmpty()) {
-            Box(
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            // Barra de búsqueda
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { viewModel.onSearchQueryChange(it) },
+                label = { Text("Buscar por nombre o serie") },
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = androidx.compose.ui.Alignment.Center
-            ) {
-                Text("No hay equipos registrados")
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(equipos) { equipo ->
-                    EquipoItem(
-                        equipo = equipo,
-                        onEdit = { onEditarClick(equipo.id) },
-                        onDelete = { equipoAEliminar = equipo }
-                    )
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                singleLine = true
+            )
+
+            if (equipos.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Text(if (searchQuery.isEmpty()) "No hay equipos registrados" else "No se encontraron resultados")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(equipos) { equipo ->
+                        EquipoItem(
+                            equipo = equipo,
+                            onEdit = { onEditarClick(equipo.id) },
+                            onDelete = { equipoAEliminar = equipo }
+                        )
+                    }
                 }
             }
         }
