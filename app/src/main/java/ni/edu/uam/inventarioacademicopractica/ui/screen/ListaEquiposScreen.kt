@@ -5,11 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -24,6 +23,30 @@ fun ListaEquiposScreen(
     onEditarClick: (Int) -> Unit
 ) {
     val equipos by viewModel.equipos.collectAsState()
+    var equipoAEliminar by remember { mutableStateOf<Equipo?>(null) }
+
+    if (equipoAEliminar != null) {
+        AlertDialog(
+            onDismissRequest = { equipoAEliminar = null },
+            title = { Text("Confirmar eliminación") },
+            text = { Text("¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        equipoAEliminar?.let { viewModel.delete(it) }
+                        equipoAEliminar = null
+                    }
+                ) {
+                    Text("Eliminar", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { equipoAEliminar = null }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -55,7 +78,8 @@ fun ListaEquiposScreen(
                 items(equipos) { equipo ->
                     EquipoItem(
                         equipo = equipo,
-                        onEdit = { onEditarClick(equipo.id) }
+                        onEdit = { onEditarClick(equipo.id) },
+                        onDelete = { equipoAEliminar = equipo }
                     )
                 }
             }
@@ -66,7 +90,8 @@ fun ListaEquiposScreen(
 @Composable
 fun EquipoItem(
     equipo: Equipo,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -97,8 +122,13 @@ fun EquipoItem(
                     )
                 }
             }
-            IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Editar Equipo")
+            Row {
+                IconButton(onClick = onEdit) {
+                    Icon(Icons.Default.Edit, contentDescription = "Editar Equipo")
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar Equipo", tint = Color.Red)
+                }
             }
         }
     }
