@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,7 +20,8 @@ import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
 @Composable
 fun ListaEquiposScreen(
     viewModel: EquipoViewModel,
-    onAgregarClick: () -> Unit
+    onAgregarClick: () -> Unit,
+    onEditarClick: (Int) -> Unit
 ) {
     val equipos by viewModel.equipos.collectAsState()
 
@@ -51,7 +53,10 @@ fun ListaEquiposScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(equipos) { equipo ->
-                    EquipoItem(equipo = equipo)
+                    EquipoItem(
+                        equipo = equipo,
+                        onEdit = { onEditarClick(equipo.id) }
+                    )
                 }
             }
         }
@@ -59,32 +64,41 @@ fun ListaEquiposScreen(
 }
 
 @Composable
-fun EquipoItem(equipo: Equipo) {
+fun EquipoItem(
+    equipo: Equipo,
+    onEdit: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
-            Text(text = equipo.nombre, style = MaterialTheme.typography.titleLarge)
-            Text(text = "Marca: ${equipo.marca}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "S/N: ${equipo.numeroSerie}", style = MaterialTheme.typography.bodyMedium)
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Surface(
-                color = if (equipo.disponible) Color(0xFF4CAF50) else Color(0xFFF44336),
-                shape = MaterialTheme.shapes.small
-            ) {
-                Text(
-                    text = if (equipo.disponible) "Disponible" else "Prestado",
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
-                )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = equipo.nombre, style = MaterialTheme.typography.titleLarge)
+                Text(text = "Marca: ${equipo.marca}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "S/N: ${equipo.numeroSerie}", style = MaterialTheme.typography.bodyMedium)
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Surface(
+                    color = if (equipo.disponible) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text(
+                        text = if (equipo.disponible) "Disponible" else "Prestado",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Default.Edit, contentDescription = "Editar Equipo")
             }
         }
     }

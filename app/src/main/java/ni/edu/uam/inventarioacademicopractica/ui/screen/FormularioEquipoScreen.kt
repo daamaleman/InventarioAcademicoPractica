@@ -12,6 +12,7 @@ import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioEquipoScreen(
+    equipoId: Int = -1,
     onEquipoGuardado: () -> Unit,
     viewModel: EquipoViewModel
 ) {
@@ -20,9 +21,23 @@ fun FormularioEquipoScreen(
     var marca by remember { mutableStateOf("") }
     var numeroSerie by remember { mutableStateOf("") }
 
+    val equipos by viewModel.equipos.collectAsState()
+    
+    LaunchedEffect(equipoId) {
+        if (equipoId != -1) {
+            val equipo = equipos.find { it.id == equipoId }
+            equipo?.let {
+                nombre = it.nombre
+                categoria = it.categoria
+                marca = it.marca
+                numeroSerie = it.numeroSerie
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Registrar Equipo") })
+            TopAppBar(title = { Text(if (equipoId == -1) "Registrar Equipo" else "Editar Equipo") })
         }
     ) { padding ->
         Column(
@@ -62,20 +77,25 @@ fun FormularioEquipoScreen(
             Button(
                 onClick = {
                     if (nombre.isNotBlank() && categoria.isNotBlank() && marca.isNotBlank() && numeroSerie.isNotBlank()) {
-                        viewModel.insert(
-                            Equipo(
-                                nombre = nombre,
-                                categoria = categoria,
-                                marca = marca,
-                                numeroSerie = numeroSerie
-                            )
+                        val equipo = Equipo(
+                            id = if (equipoId == -1) 0 else equipoId,
+                            nombre = nombre,
+                            categoria = categoria,
+                            marca = marca,
+                            numeroSerie = numeroSerie,
+                            disponible = if (equipoId == -1) true else equipos.find { it.id == equipoId }?.disponible ?: true
                         )
+                        if (equipoId == -1) {
+                            viewModel.insert(equipo)
+                        } else {
+                            viewModel.update(equipo)
+                        }
                         onEquipoGuardado()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Guardar Equipo")
+                Text(if (equipoId == -1) "Guardar Equipo" else "Actualizar Equipo")
             }
         }
     }
