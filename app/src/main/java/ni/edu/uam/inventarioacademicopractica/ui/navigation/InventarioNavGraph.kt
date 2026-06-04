@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import ni.edu.uam.inventarioacademicopractica.InventarioApplication
 import ni.edu.uam.inventarioacademicopractica.ui.screen.*
+import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.DashboardViewModel
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.ViewModelFactory
 
@@ -30,10 +31,18 @@ fun InventarioNavGraph(navController: NavHostController) {
         startDestination = Screen.Dashboard.route
     ) {
         composable(Screen.Dashboard.route) {
-            DashboardScreen()
+            val dashboardViewModel: DashboardViewModel = viewModel(factory = factory)
+            DashboardScreen(
+                viewModel = dashboardViewModel,
+                onVerEquiposClick = { navController.navigate(Screen.ListaEquipos.route) }
+            )
         }
         composable(Screen.ListaEquipos.route) {
-            ListaEquiposScreen()
+            val equipoViewModel: EquipoViewModel = viewModel(factory = factory)
+            ListaEquiposScreen(
+                viewModel = equipoViewModel,
+                onAgregarClick = { navController.navigate(Screen.FormularioEquipo.route) }
+            )
         }
         composable(Screen.FormularioEquipo.route) {
             val equipoViewModel: EquipoViewModel = viewModel(factory = factory)
