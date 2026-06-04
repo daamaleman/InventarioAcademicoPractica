@@ -4,17 +4,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import ni.edu.uam.inventarioacademicopractica.data.local.entity.Equipo
 import ni.edu.uam.inventarioacademicopractica.ui.viewmodel.EquipoViewModel
+import ni.edu.uam.inventarioacademicopractica.util.CsvExporter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +27,7 @@ fun ListaEquiposScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     var equipoAEliminar by remember { mutableStateOf<Equipo?>(null) }
+    val context = LocalContext.current
     
     val categorias = listOf("Laptop", "Monitor", "Impresora", "Router")
 
@@ -55,7 +56,21 @@ fun ListaEquiposScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Inventario de Equipos") })
+            TopAppBar(
+                title = { Text("Inventario de Equipos") },
+                actions = {
+                    IconButton(onClick = {
+                        val path = CsvExporter.exportEquiposToCsv(context, equipos)
+                        if (path != null) {
+                            Toast.makeText(context, "Exportado a: $path", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "Error al exportar", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Icon(Icons.Default.Share, contentDescription = "Exportar CSV")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAgregarClick) {
